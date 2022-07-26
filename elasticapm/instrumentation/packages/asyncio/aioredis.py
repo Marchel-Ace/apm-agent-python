@@ -93,13 +93,13 @@ class RedisConnectionInstrumentation(AbstractInstrumentedModule):
 
 
 def _get_destination_info(connection):
-    destination_info = {"service": {"name": "", "resource": "redis", "type": ""}}
-
+    destination_info = {"service": {
+        "name": "", "resource": "redis", "type": ""}}
     if hasattr(connection, "_pool_or_conn"):
-        destination_info["port"] = int(connection._pool_or_conn.address[1])
+        destination_info["port"] = connection._pool_or_conn.address[1]
         destination_info["address"] = connection._pool_or_conn.address[0]
-    else:
-        destination_info["port"] = int(connection.address[1])
-        destination_info["address"] = connection.address[0]
-
+    if hasattr(connection, "_address"):
+        if isinstance(connection._address, tuple):
+            destination_info["port"] = connection._address[1]
+            destination_info["address"] = connection._address[0]
     return destination_info
